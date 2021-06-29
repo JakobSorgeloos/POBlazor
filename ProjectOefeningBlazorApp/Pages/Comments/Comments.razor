@@ -1,0 +1,38 @@
+﻿@page "/allC"
+
+
+@inject CommentService commentService
+
+
+
+
+<h1>CommentList</h1>
+
+<div class="card-deck">
+@if (MediaList is null)
+{
+    <p><em>Loading...!</em></p>
+}
+
+else
+{
+    foreach (var item in MediaList)
+    {
+                    <div class="card">
+                        <div class="card-header"> @item.Title</div>
+                        <div class=" card-body"> @item.CommentText</div>
+                    </div>
+    }
+
+}
+</div>
+@code {
+
+    List<AddCommentViewModel> MediaList = new List<AddCommentViewModel>();
+protected override async Task OnInitializedAsync()
+{
+    MediaList = await Task.Run(() => commentService.GetAllCommentViewModels());
+}
+
+
+}

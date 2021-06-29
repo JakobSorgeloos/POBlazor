@@ -1,0 +1,69 @@
+﻿@page "/comment"
+
+@inject CommentService commentService
+@inject NavigationManager NavigationManager
+
+    <h3>AddComment</h3>
+<AuthorizeView>
+
+    <Authorized>
+        <h2>Add comment</h2>
+        <hr />
+
+        <form>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                       <label class="control-label" for="Title">Title</label>
+                        <input form="Title" class="form-control" @bind="@vmForm.Title" />
+                    </div>
+                    <div class=form-group>
+                        <label class="control-label" for="CommentText"> Text </label>
+                        <textarea form="CommentText" class="form-control" rows="3" placeholder="..." @bind="@vmForm.CommentText"></textarea>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <input type="button" class="btn btn-primary" @onclick="@CreateMedia" value="AddComment" />
+                        <input type="button" class="btn btn-primary" @onclick="@Cancel" value="Cancel" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+
+        <p>Please <a href="Identity/Account/Login">login here</a></p>
+        <p>Or <a href="Identity/Account/Register">register</a> if you haven't already</p>
+
+    </NotAuthorized>
+
+
+</AuthorizeView>
+
+
+
+
+@code {
+    AddCommentViewModel vmForm = new AddCommentViewModel();
+    protected void CreateMedia()
+    {
+        commentService.InsertComment(vmForm);
+        NavigationManager.NavigateTo("allC");
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("allC");
+    }
+
+}
+
+@code {
+
+}
