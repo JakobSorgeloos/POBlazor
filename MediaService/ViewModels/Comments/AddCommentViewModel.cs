@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.ViewModels.Comment
+namespace Services.ViewModels.Comments
 {
     public class AddCommentViewModel
     {

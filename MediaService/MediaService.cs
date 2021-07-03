@@ -8,32 +8,36 @@ using Domain;
 using Services.Interfaces;
 using Services.ViewModels;
 using Services.ViewModels.Media;
+using Microsoft.Extensions.Options;
 
 namespace Services.Service
 {
-    public class MediaService /*: IMediaService*/
+    public class MediaService /*TODO : IMediaService*/
     {
 
         #region Property
         private readonly ApplicationDbContext _applicationDbContext;
+        public  IOptions<AppSettings> _config { get; set; }
+
         #endregion
 
         #region Constructor
-        public MediaService(ApplicationDbContext appDBContext)
+        public MediaService(ApplicationDbContext appDBContext, IOptions<AppSettings> config)
         {
             _applicationDbContext = appDBContext;
+            _config = config;
         }
         #endregion
 
         #region Get List of Media
         public async Task<List<Media>> GetAllMedia()
         {
-            return  await _applicationDbContext.MediaSites.ToListAsync();
+            return await _applicationDbContext.MediaSites.ToListAsync();
         }
         #endregion
 
         #region Insert Media
-        public  bool InsertMedia(AddMediaViewModel addMediaViewModel)
+        public bool InsertMedia(AddMediaViewModel addMediaViewModel)
 
         {
             var media = ConvertAddVmToMedia(addMediaViewModel);
@@ -53,15 +57,15 @@ namespace Services.Service
 
         #region Update Media
 
-        
+
         public async Task<bool> UpdateMedia(int Id, EditMediaViewModel editMediaViewModel)
         {
-            var media =  await GetMedia(Id);
-            media.IsPublic = editMediaViewModel.IsPublic;
+            var media = await GetMedia(Id);
+            media.IsPublic = editMediaViewModel.IsPublic;//Todo Add mapper
             media.Title = editMediaViewModel.Title;
             media.Url = editMediaViewModel.Url;
             media.EmbeddedUrl = EmbeddedUrlBuilder(editMediaViewModel.Url);
-            
+
             _applicationDbContext.MediaSites.Update(media);
             await _applicationDbContext.SaveChangesAsync();
             return true;
@@ -70,7 +74,7 @@ namespace Services.Service
 
         #region DeleteMedia
         public async Task<bool> DeleteMediaAsync(int Id)
-            
+
         {
             var media = await GetMedia(Id);
             _applicationDbContext.Remove(media);
@@ -92,8 +96,7 @@ namespace Services.Service
                     EmbeddedUrl = media.EmbeddedUrl,
                     
                     Title = media.Title
-                }
-                );
+                });
             }
             return listvm;
         }
@@ -143,39 +146,24 @@ namespace Services.Service
 
         #region Convert EditMediaVM to Media & Media to EditMediaVM
 
-        public Media ConvertEditVmToMedia (EditMediaViewModel editMediaViewModel)
+        public Media ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel)
         {
-                //create correct media Object, see Select MediaType based of input
-                var media = MediaSwitcheroo(editMediaViewModel.MediaType);
+            //create correct media Object, see Select MediaType based of input //ToDo: Overbodig, pas aan in logica
+            var media = MediaSwitcheroo(editMediaViewModel.MediaType);
 
-                //create correct embbed url spotify and youtube only at the moment
-                media.EmbeddedUrl = EmbeddedUrlBuilder(editMediaViewModel.Url);
+            //create correct embbed url spotify and youtube only at the moment
+            media.EmbeddedUrl = EmbeddedUrlBuilder(editMediaViewModel.Url);
 
-                media.Title = editMediaViewModel.Title;
-                media.Url = editMediaViewModel.Url;
-                media.IsPublic = editMediaViewModel.IsPublic;
-                media.Key = editMediaViewModel.Key;
-                //TODO add user with login credentials.
+            media.Title = editMediaViewModel.Title;
+            media.Url = editMediaViewModel.Url;
+            media.IsPublic = editMediaViewModel.IsPublic;
+            media.Key = editMediaViewModel.Key;
+            //TODO add user with login credentials.
 
-                return media;
-            
+            return media;
+
         }
-        //public async Task<Media> ConvertEditVmToMedia(int Id, EditMediaViewModel editMediaViewModel)
-        //{
-        //    var media = await GetMedia(Id);
-                        
-
-        //    //create correct embbed url spotify and youtube only at the moment
-        //    media.EmbeddedUrl = EmbeddedUrlBuilder(editMediaViewModel.Url);
-
-        //    media.Title = editMediaViewModel.Title;
-        //    media.Url = editMediaViewModel.Url;
-        //    media.IsPublic = editMediaViewModel.IsPublic;
-        //   //TODO add user with login credentials.
-
-        //    return media;
-
-        //}
+       
 
         public async Task<EditMediaViewModel> ConvertMediaToEditVm(int Id)
         {
@@ -205,7 +193,7 @@ namespace Services.Service
                 case Film:
                     return "Movie";
                 case Serie:
-                default:    
+                default:
                     return "Serie";
             }
         }
@@ -217,31 +205,27 @@ namespace Services.Service
         #region Build Embedded Url
         public string EmbeddedUrlBuilder(string url)
         {
+
+            
             string id = "";
             var z = "";
             if (url.Contains("you"))
             {
-
                 var y = url.Split('?');
-
                 var x = y[1].Split('&');
                 id = x[0].Substring(2);
-                z = "https://www.youtube.com/embed/" + id;
+                z = _config.Value.YoutubeLinks + id;
                 return z;
-
             }
             else
             {
                 var y = url.Split(new string[] { ".com/" }, StringSplitOptions.None);
                 var x = y[1].Split('?');
                 id = x[0];
-                z = "https://open.spotify.com/embed/" + id;
+                z = _config.Value.SpotifyLinks + id;
                 return (z);
             }
-
         }
         #endregion
-
     }
-
 }

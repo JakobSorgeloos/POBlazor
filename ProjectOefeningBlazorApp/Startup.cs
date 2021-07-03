@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor;
 using MudBlazor.Services;
 using ProjectOefeningBlazorApp.Areas.Identity;
 using Repository;
@@ -37,7 +38,22 @@ namespace ProjectOefeningBlazorApp
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMudServices(); //MudBlazor
+            services.AddMvc();
+            services.AddOptions();//Adding functionality to inject IOptions<T>
+            services.Configure<AppSettings>(Configuration.GetSection("Url")); //Add our config object so it can be injected
+
+            services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+
+                config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.NewestOnTop = false;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.VisibleStateDuration = 10000;
+                config.SnackbarConfiguration.HideTransitionDuration = 500;
+                config.SnackbarConfiguration.ShowTransitionDuration = 500;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            }); //MudBlazor + snackbar
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -50,6 +66,7 @@ namespace ProjectOefeningBlazorApp
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddScoped<MediaService>();
             services.AddScoped<CommentService>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

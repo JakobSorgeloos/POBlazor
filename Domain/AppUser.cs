@@ -11,7 +11,12 @@ namespace Domain
     {
         #region Properties
         //TODO add roles+ implement role usage
+
+        
         public string Name { get; set; }
+
+        public string Initials { get; set; }
+      
         public List<Media> Uploads { get; set; }
         public List<Review> Reviews { get; set; }
         public List<Comment> Comments { get; set; }

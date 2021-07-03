@@ -45,7 +45,7 @@ namespace Domain
         //Abstracte klasse die gebruikt wordt om de mediaobjecten in 1 lijst te kunnen steken (overzichtspagina)
         //Staan veel algemene properties in
         
-        //AvgRating is een "invalid column name"
+       
        
 
         //TODO: Specifieke properties per mediatype aanmaken bvb: Serie heeft episodes en seizoenen

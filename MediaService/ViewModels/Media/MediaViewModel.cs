@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,15 @@ namespace Services.ViewModels.Media
         public string  EmbeddedUrl { get; set; }
         public string  Title { get; set; }
         public string  NameUser { get; set; }
+        public string Url { get; set; }
+        public bool  IsPublic { get; set; }
+
+        public List<Review> Reviews { get; set; }
+        public AppUser AppUser { get; set; }
+
+        public float GemRating { get; set; }
+        public List<Comment> Comments { get; set; }
+        public List<Playlist> Playlists { get; set; }
+
     }
 }

@@ -7,7 +7,7 @@ using Repository;
 using Domain;
 using Services.Interfaces;
 using Services.ViewModels;
-using Services.ViewModels.Comment;
+using Services.ViewModels.Comments;
 
 namespace Services.Service
 {

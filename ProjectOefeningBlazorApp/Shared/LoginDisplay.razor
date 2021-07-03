@@ -1,12 +1,22 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
+        
+        
+
+        <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large">
+
+            <MudButton Link="/Identity/Account/Manage">Hello, @context.User.Identity.Name</MudButton>
+            <form method="post" action="Identity/Account/LogOut">
+            <button type="submit"  class="mud-button-root mud-button mud-button-text mud-button-text-default mud-button-text-size-medium mud-ripple" _bl_22c1aac4-d4e7-4697-9633-a6c9c6fde684=""><span class="mud-button-label">Logout</span></button>
         </form>
+        </MudButtonGroup>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
+        <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large">
+
+            <MudButton Link="/Identity/account/Register">Register</MudButton>
+            <MudButton  Link="/Identity/account/Login">Login</MudButton>
+        </MudButtonGroup>
     </NotAuthorized>
 </AuthorizeView>
+
