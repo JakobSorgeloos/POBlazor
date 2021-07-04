@@ -12,7 +12,7 @@ namespace Services.ViewModels.Media
         public int Key { get; set; }
         public string  EmbeddedUrl { get; set; }
         public string  Title { get; set; }
-        public string  NameUser { get; set; }
+        public string  InitialsUser { get; set; }
         public string Url { get; set; }
         public bool  IsPublic { get; set; }
 

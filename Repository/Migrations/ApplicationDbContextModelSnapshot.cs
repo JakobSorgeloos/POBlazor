@@ -135,6 +135,9 @@ namespace Repository.Migrations
                     b.Property<float>("GemRating")
                         .HasColumnType("real");
 
+                    b.Property<string>("InitialsUser")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
 

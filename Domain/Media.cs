@@ -29,9 +29,9 @@ namespace Domain
         
         [Display(Name = "Publiek")]
 
-        public bool IsPublic { get; set; } = true;
+        public bool IsPublic { get; set; }
 
-
+        public string InitialsUser { get; set; }
         public List<Review> Review { get; set; }
         public AppUser User { get; set; }
 

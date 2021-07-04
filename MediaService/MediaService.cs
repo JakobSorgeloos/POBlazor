@@ -91,17 +91,18 @@ namespace Services.Service
             var listvm = new List<MediaViewModel>();
             foreach (var media in medias)
             {
+
                 listvm.Add(new MediaViewModel()
                 {
+
                     Key = media.Key,
                     EmbeddedUrl = media.EmbeddedUrl,
                     AppUser = media.User,
                     Title = media.Title,
                     IsPublic = media.IsPublic,
                     Url = media.Url,
-                    
-
-                });
+                    InitialsUser = media.InitialsUser
+                }) ;
             }
             return listvm;
         }
@@ -120,7 +121,7 @@ namespace Services.Service
             media.Url = addMediaViewModel.Url;
             media.IsPublic = addMediaViewModel.IsPublic;
             media.User = _applicationDbContext.Users.FirstOrDefault(_ => _.UserName == addMediaViewModel.Gebruiker);
-
+            media.InitialsUser = media.User.Initials;
             return media;
         }
 
@@ -132,7 +133,7 @@ namespace Services.Service
 
         public async Task<Media> ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel)
         {
-            //create correct media Object, see Select MediaType based of input //ToDo: Overbodig, pas aan in logica
+            
             var media = await GetMedia(editMediaViewModel.Key);
 
             //create correct embbed url spotify and youtube only at the moment
@@ -142,7 +143,7 @@ namespace Services.Service
             media.Url = editMediaViewModel.Url;
             media.IsPublic = editMediaViewModel.IsPublic;
            
-            //TODO add user with login credentials.
+          
 
             return media;
 
@@ -159,14 +160,8 @@ namespace Services.Service
                 Key = media.Key,
                 Title = media.Title
             };
-
-            
             return editVm;
-
         }
-
-        
-
         #endregion
 
         #region Build Embedded Url

@@ -164,6 +164,7 @@ namespace Repository.Migrations
                     EmbeddedUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    InitialsUser = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     GemRating = table.Column<float>(type: "real", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false)
