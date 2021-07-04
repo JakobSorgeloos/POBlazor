@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
+
     
 
         
@@ -13,15 +14,21 @@
             <MudLayout>
                 <MudAppBar Elevation="1">
                     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                    <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large">
+
+                        
+                        <MudButton Link="Media">MediaMaestro</MudButton>
+                    </MudButtonGroup>
                     <MudSpacer />
                     <LoginDisplay></LoginDisplay>
+                    
                     <MudIconButton Icon="@Icons.Material.Rounded.Brightness4" Color="Color.Inherit" Title="Toggle Dark/Light Mode" OnClick="@((e) => DarkMode())">Toggle Dark/Light Mode</MudIconButton>
                 </MudAppBar>
                 <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
                     <MudDrawerHeader>
-                        <MudText Typo="Typo.h5" Class="mt-1">Media Maestro</MudText>
+                        <MudText Typ    o="Typo.h5" Class="mt-1">Media Maestro</MudText>
                     </MudDrawerHeader>
-                    <NavMenu />
+                    <NavMenu/>
                 </MudDrawer>
                 <MudMainContent>
                     @Body

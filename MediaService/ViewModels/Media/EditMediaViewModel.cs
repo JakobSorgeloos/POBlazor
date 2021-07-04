@@ -14,7 +14,7 @@ namespace Services.ViewModels.Media
         public string Url { get; set; }
         public bool IsPublic { get; set; }
         public string Gebruiker { get; set; }
-        public string MediaType { get; set; }
+       
         #endregion
     }
 }

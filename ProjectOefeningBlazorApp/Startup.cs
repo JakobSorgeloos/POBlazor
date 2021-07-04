@@ -41,7 +41,7 @@ namespace ProjectOefeningBlazorApp
             services.AddMvc();
             services.AddOptions();//Adding functionality to inject IOptions<T>
             services.Configure<AppSettings>(Configuration.GetSection("Url")); //Add our config object so it can be injected
-
+            services.AddHttpContextAccessor();
             services.AddMudServices(config =>
             {
                 config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
@@ -66,6 +66,7 @@ namespace ProjectOefeningBlazorApp
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddScoped<MediaService>();
             services.AddScoped<CommentService>();
+
             
         }
 

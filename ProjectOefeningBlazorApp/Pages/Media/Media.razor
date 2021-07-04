@@ -3,115 +3,129 @@
 @inject IDialogService dialogService
 
 
-<NavLink class="nav-link" href="AddMedia">
-    <span class="oi oi-plus" aria-hidden="true"></span>
-    Add New Media
-</NavLink>
 
-<h1>MediaList</h1>
 
-<div class="card-deck">
 
-    @if (MediaList.Count == 0)
-    {
-        <p><em>Loading...!</em></p>
-    }
 
-    else
-    {
-        foreach (var item in MediaList)
+<MudGrid>
+
+    <MudItem xs="6">
+
+        <MudGrid Spacing="2" Justify="Justify.Center">
+
+            @if (MediaList.Count == 0)
+            {
+                <MudText Class="pt-3">Loading...!</MudText>
+            }
+
+            else
+            {
+                foreach (var item in MediaList)
+                {
+                    <MudItem>
+                        <MudCard>
+                            <MudCardHeader>
+                                <CardHeaderAvatar>
+                                    <MudAvatar Color="Color.Secondary">@item.AppUser.Initials</MudAvatar>
+                                </CardHeaderAvatar>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6"> @item.Title</MudText>
+                                </CardHeaderContent>
+                                <CardHeaderActions>
+                                    <MudIconButton OnClick="@(() => EditMedia(item))" Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
+                                    <MudIconButton OnClick="@(() => DeleteMedia(item))" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
+                                </CardHeaderActions>
+                            </MudCardHeader>
+
+                            <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+                                <MudTabPanel Icon="@Icons.Material.Filled.Equalizer" Text="Media">
+                                    <MudContainer>
+                                        <iframe style=" height: 250px; border: none" src="@item.EmbeddedUrl" title="@item.Title"></iframe>
+                                    </MudContainer>
+                                </MudTabPanel>
+                                <MudTabPanel Icon="@Icons.Material.Filled.ListAlt" Text=" Details">
+                                    <MudCardContent>
+                                        <MudForm>
+                                            <MudField Variant="Variant.Outlined" Label="Title" Disabled="true">@item.Title</MudField>
+                                            <MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
+                                            <MudField Variant="Variant.Outlined" Label="EmbeddedUrl" Disabled="true">@item.EmbeddedUrl</MudField>
+                                            <MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
+                                            <MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
+
+                                        </MudForm>
+                                    </MudCardContent>
+
+                                </MudTabPanel>
+
+                            </MudTabs>
+                            <MudCardActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                }
+
+            }
+
+        </MudGrid>
+
+    </MudItem>
+    
+</MudGrid>
+<AuthorizeView>
+    <Authorized>
+        <MudContainer Class ="pt-3"  MaxWidth="MaxWidth.ExtraLarge">
+            <MudTooltip Placement="Placement.End" Text="Add media">
+                <MudFab OnClick="@(() => AddMedia())" Icon="@Icons.Material.Filled.Add" Color="Color.Secondary" />
+            </MudTooltip>
+        </MudContainer>
+    </Authorized>
+</AuthorizeView>
+    @code {
+
+        List<MediaViewModel> MediaList = new List<MediaViewModel>();
+
+        protected override async Task OnInitializedAsync()
         {
-
-            <MudCard>
-                <MudCardHeader>
-                    <CardHeaderAvatar>
-                        <MudAvatar Color="Color.Secondary">I</MudAvatar>
-                    </CardHeaderAvatar>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.body1">@item.Title</MudText>
-                        </CardHeaderContent>
-                    <CardHeaderActions>
-                         <MudIconButton OnClick="@(() => Details(item))" Icon="@Icons.Material.Filled.ListAlt" Color="Color.Default" />
-                        <MudIconButton OnClick="@(() => EditMedia(item))" Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
-                        <MudIconButton OnClick="@(() => DeleteMedia(item))" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardMedia Image="_content/MudBlazor.Docs/images/content-template-pilars.png" Height="250" />
-                <MudCardContent>
-                    <MudText Typo="Typo.body2">This photo was taken in a small village in Istra Croatia.</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
-                </MudCardActions>
-            </MudCard>
-
-
-
-
-            @*<div class="col-lg-4 d-flex d-block align-items-lg-stretch">
-                    <div class="card mt-5 ">
-                        <div class="card-header">
-                            <ul class="nav nav-pills card-header-pills">
-                                <li class="nav-item ">
-                                    <a class="nav-link" href="Details/@item.Key"><span class="oi oi-info" aria-hidden="true"></span> Details</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="Editmedia/@item.Key"><span class="oi oi-pencil" aria-hidden="true"></span> Edit</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="Delete/@item.Key" tabindex="-1">Delete</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="card-body  embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="@item.EmbeddedUrl" title="@item.Title"></iframe>
-                        </div>
-                        <p class="card-text"><small class="text-muted">@item.Title</small></p>
-                    </div>
-
-                </div>*@
-
-        }
-    }
-</div>
-
-@code {
-
-    List<MediaViewModel> MediaList = new List<MediaViewModel>();
-    protected override async Task OnInitializedAsync()
-    {
-        MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
-    }
-    protected async Task DeleteMedia(MediaViewModel media)
-    {
-        var parameters = new DialogParameters();
-        parameters.Add("ContentText", "Do you really want to delete this media? This process cannot be undone.");
-        parameters.Add("ButtonText", "Delete");
-        parameters.Add("Color", Color.Error);
-
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
-        var dialog = dialogService.Show<GeneralDialog>("Delete", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Cancelled)
-        {
-            await mediaService.DeleteMediaAsync(media.Key);
-            _snackbar.Add("Item was deleted successfully", Severity.Info, config => { config.CloseAfterNavigation = false; });
             MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
         }
+        protected async Task DeleteMedia(MediaViewModel media)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("ContentText", "Do you really want to delete this media? This process cannot be undone.");
+            parameters.Add("ButtonText", "Delete");
+            parameters.Add("Color", Color.Error);
 
+            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+            var dialog = dialogService.Show<GeneralDialog>("Delete", parameters, options);
+            var result = await dialog.Result;
+
+            if (!result.Cancelled)
+            {
+                await mediaService.DeleteMediaAsync(media.Key);
+                _snackbar.Add("Item was deleted successfully", Severity.Info);
+                MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
+            }
+        }
+
+        protected async Task EditMedia(MediaViewModel media)
+        {
+            MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
+
+        }
+        protected async Task AddMedia()
+        {
+            var dialog = dialogService.Show<AddMedia>();
+            var result = await dialog.Result;
+
+            if (!result.Cancelled)
+            {
+                _snackbar.Add("Item was added succesfully", Severity.Success);
+                MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
+            }
+
+        }
 
     }
-
-    protected async Task EditMedia(MediaViewModel media)
-    {
-        MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
-    }
-    protected void Details(MediaViewModel media)
-    {
-        
-    }
-
-}

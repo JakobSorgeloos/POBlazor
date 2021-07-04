@@ -1,69 +1,62 @@
-﻿@page "/Editmedia/{Id}"
+﻿
 
-
+@inject IHttpContextAccessor _httpContext
 @inject MediaService mediaService
 @inject NavigationManager NavigationManager
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Add Media</MudText>
+    </TitleContent>
+    <DialogContent>
 
-    <h2>Edit Media</h2>
-    <hr />
+        <MudForm @ref="@fm">
+            <MudTextField T="string" @bind-Text="vmForm.Title" Label="Title" Required="true"></MudTextField>
+            <MudTextField T="string" @bind-Text="vmForm.Url" Label="Url" HelperText="No youtu.be links, only youtube.com/watch" Required="true"></MudTextField>
+            <MudSelect Required="true" T="string" Label="Type of media">
+                <MudSelectItem Value="@("Podcast")" />
+                <MudSelectItem Value="@("Music")" />
+                <MudSelectItem Value="@("Film")" />
+                <MudSelectItem Value="@("Serie")" />
+            </MudSelect>
+            <MudSwitch Color="Color.Success" @bind-Checked="vmForm.IsPublic">Public?</MudSwitch>
 
-    <form>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="form-group">
-                    <label for="Url" class="control-label">Url</label>
-                    <input form="Url" class="form-control" @bind="@vmForm.Url" />
-                </div>
-                <div class="form-group">
-                    <label for="Title" class="control-label">Title</label>
-                    <input form="Title" class="form-control" @bind="@vmForm.Title" />
-                </div>
-                <div class="form-group">
-                    <label for="MediaType" class="control-label">Media Type</label>
-                    <input form="MediaType" disabled class="form-control" value="@vmForm.MediaType" />
-                   </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                        <label class="form-check-label" for="IsPublic" @bind-="@vmForm.IsPublic">
-                            Public
-                        </label>
-                    </div>
-                </div>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Primary" OnClick="CreateMedia">Add</MudButton>
+    </DialogActions>
 
 
+</MudDialog>
 
-            </div>
-        
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <input type="button" class="btn btn-primary" @onclick="@CreateMedia" value="Save" />
-                    <input type="button" class="btn btn-primary" @onclick="@Cancel" value="Cancel" />
-                    <a class="btn btn-primary" href="Delete/@vmForm.Key">
-                        <span class="oi oi-trash" aria-hidden="true">Delete</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </form>
+
+
+
+
+
+
+
+
+
+
+
+
 @code {
-    [Parameter]
-    public string Id { get; set; }
-
-    EditMediaViewModel vmForm = new EditMediaViewModel();
-    protected override async Task OnInitializedAsync()
+    MudForm fm;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    AddMediaViewModel vmForm = new AddMediaViewModel();
+    protected void CreateMedia()
     {
-        vmForm = await Task.Run(() => mediaService.ConvertMediaToEditVm(Convert.ToInt32(Id)));
-    }
-    protected async void CreateMedia()
-    {
-       await mediaService.UpdateMedia(Convert.ToInt32(Id),vmForm);
-        NavigationManager.NavigateTo("media");
+        vmForm.Gebruiker = _httpContext.HttpContext.User.Identity.Name;
+        mediaService.InsertMedia(vmForm);
+        MudDialog.Close(DialogResult.Ok(true));
     }
     void Cancel()
     {
-        NavigationManager.NavigateTo("media");
+        MudDialog.Cancel();
     }
 
-    }
+}

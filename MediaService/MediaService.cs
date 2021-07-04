@@ -41,6 +41,7 @@ namespace Services.Service
 
         {
             var media = ConvertAddVmToMedia(addMediaViewModel);
+         
             _applicationDbContext.MediaSites.Add(media);
             _applicationDbContext.SaveChanges();
             return true;
@@ -94,8 +95,12 @@ namespace Services.Service
                 {
                     Key = media.Key,
                     EmbeddedUrl = media.EmbeddedUrl,
+                    AppUser = media.User,
+                    Title = media.Title,
+                    IsPublic = media.IsPublic,
+                    Url = media.Url,
                     
-                    Title = media.Title
+
                 });
             }
             return listvm;
@@ -106,7 +111,7 @@ namespace Services.Service
         public Media ConvertAddVmToMedia(AddMediaViewModel addMediaViewModel)
         {
             //create correct media Object, see Select MediaType based of input
-            var media = MediaSwitcheroo(addMediaViewModel.MediaType);
+            var media = new Music();
 
             //create correct embbed url spotify and youtube only at the moment
             media.EmbeddedUrl = EmbeddedUrlBuilder(addMediaViewModel.Url);
@@ -114,42 +119,21 @@ namespace Services.Service
             media.Title = addMediaViewModel.Title;
             media.Url = addMediaViewModel.Url;
             media.IsPublic = addMediaViewModel.IsPublic;
-            //TODO add user with login credentials.
+            media.User = _applicationDbContext.Users.FirstOrDefault(_ => _.UserName == addMediaViewModel.Gebruiker);
 
             return media;
         }
 
-        #region Select MediaType based of input
-        private Media MediaSwitcheroo(string type)
-        {
-            Media media;
-            switch (type)
-            {
-                case "Podcast":
-                    media = new Podcast();
-                    return media;
-                case "Music":
-                    media = new Music();
-                    return media;
-                case "Movie":
-                    media = new Film();
-                    return media;
-                case "Serie":
-                default:
-                    media = new Serie();
-                    return media;
-            }
-        }
-        #endregion
+        
 
         #endregion
 
         #region Convert EditMediaVM to Media & Media to EditMediaVM
 
-        public Media ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel)
+        public async Task<Media> ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel)
         {
             //create correct media Object, see Select MediaType based of input //ToDo: Overbodig, pas aan in logica
-            var media = MediaSwitcheroo(editMediaViewModel.MediaType);
+            var media = await GetMedia(editMediaViewModel.Key);
 
             //create correct embbed url spotify and youtube only at the moment
             media.EmbeddedUrl = EmbeddedUrlBuilder(editMediaViewModel.Url);
@@ -157,7 +141,7 @@ namespace Services.Service
             media.Title = editMediaViewModel.Title;
             media.Url = editMediaViewModel.Url;
             media.IsPublic = editMediaViewModel.IsPublic;
-            media.Key = editMediaViewModel.Key;
+           
             //TODO add user with login credentials.
 
             return media;
@@ -176,29 +160,12 @@ namespace Services.Service
                 Title = media.Title
             };
 
-            editVm.MediaType = SelectMediaString(media);
+            
             return editVm;
 
         }
 
-        #region Select Mediatype String
-        private string SelectMediaString(Media media)
-        {
-            switch (media)
-            {
-                case Podcast:
-                    return "Podcast";
-                case Music:
-                    return "Music";
-                case Film:
-                    return "Movie";
-                case Serie:
-                default:
-                    return "Serie";
-            }
-        }
-
-        #endregion
+        
 
         #endregion
 

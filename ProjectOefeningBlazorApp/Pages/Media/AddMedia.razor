@@ -1,78 +1,45 @@
 ﻿
-@page "/addmedia"
 
-@inject MediaService mediaService 
+@inject IHttpContextAccessor _httpContext
+@inject MediaService mediaService
 @inject NavigationManager NavigationManager
-<AuthorizeView>
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Add Media</MudText>
+    </TitleContent>
+    <DialogContent>
 
-<Authorized>
-    <h2>Add Media</h2>
-<hr />
+        <MudForm @ref="@fm">
+            <MudTextField T="string" @bind-Text="vmForm.Title" Label="Title" Required="true"></MudTextField>
+            <MudTextField T="string" @bind-Text="vmForm.Url" Label="Url" HelperText="No youtu.be links, only youtube.com/watch" Required="true"></MudTextField>
+            
+            <MudSwitch Color="Color.Primary" @bind-Checked="vmForm.IsPublic">Public?</MudSwitch>
 
-<form>
-    <div class="row">
-        <div class="col-md-8">
-            <div class="form-group">
-                <label for="Url" class="control-label">Url</label>
-                <input form="Url" class="form-control" @bind="@vmForm.Url" />
-            </div>
-            <div class="form-group">
-                <label for="Title" class="control-label">Title</label>
-                <input form="Title" class="form-control" @bind="@vmForm.Title" />
-            </div>
-            <div class="form-group">
-                <label for="MediaType" class="control-label">Media Type</label>
-                <select @bind="@vmForm.MediaType" class="form-control">
-                    <option value="">-Select Type</option>
-                    <option value="Podcast">Podcast</option>
-                    <option value="Music">Music</option>
-                    <option value="Movie">Movie</option>
-                    <option value="Series">Series</option>
-                </select>
-                </div>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                    <label class="form-check-label" for="IsPublic" @bind-="@vmForm.IsPublic">
-                       Public
-                    </label>
-                </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <input type="button" class="btn btn-primary" @onclick="@CreateMedia" value="Save" />
-                <input type="button" class="btn btn-primary" @onclick="@Cancel" value="Cancel" />
-            </div>
-        </div>
-    </div>
-</form>
-    </Authorized>
-    <NotAuthorized>
-
-        <p>Please <a href="Identity/Account/Login">login here</a></p> 
-        <p>Or <a href="Identity/Account/Register">register</a> if you haven't already</p>
-
-    </NotAuthorized>
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Primary" OnClick="CreateMedia">Add</MudButton>
+    </DialogActions>
 
 
-    </AuthorizeView>
-
-
+</MudDialog>
 
 
 @code {
+    MudForm fm;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     AddMediaViewModel vmForm = new AddMediaViewModel();
-    protected  void CreateMedia()
+    protected void CreateMedia()
     {
+        vmForm.Gebruiker = _httpContext.HttpContext.User.Identity.Name;
         mediaService.InsertMedia(vmForm);
-        NavigationManager.NavigateTo("media");
+        MudDialog.Close(DialogResult.Ok(true));
     }
     void Cancel()
     {
-        NavigationManager.NavigateTo("media");
+        MudDialog.Cancel();
     }
 
 }

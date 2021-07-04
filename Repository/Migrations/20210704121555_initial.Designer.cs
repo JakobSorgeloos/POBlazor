@@ -10,7 +10,7 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210703115221_initial")]
+    [Migration("20210704121555_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,7 +50,6 @@ namespace Repository.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
