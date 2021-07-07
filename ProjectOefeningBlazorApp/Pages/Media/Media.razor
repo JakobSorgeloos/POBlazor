@@ -47,10 +47,10 @@
 							  <MudTabPanel Icon="@Icons.Material.Filled.ListAlt" Text=" Details">
 								<MudCardContent>
 									<MudForm>
-										<MudField Variant="Variant.Outlined" Label="Title" Disabled="true">@item.Title</MudField>
-										<MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
-										<MudField Variant="Variant.Outlined" Label="EmbeddedUrl" Disabled="true">@item.EmbeddedUrl</MudField>
-										<MudField Variant="Variant.Outlined" Label="Uploader" Disabled="true">@item.AppUser.Name</MudField>
+										<MudTextField T="string" ReadOnly="true" Variant="Variant.Outlined" Label="Title" Text="@item.Title"></MudTextField>
+										<MudTextField T="string" ReadOnly="true" Variant="Variant.Outlined" Label="Url" Lines="2" Text="@item.Url"></MudTextField>
+										<MudTextField T="string" ReadOnly="true" Variant="Variant.Outlined" Label="EmbeddedUrl" Lines="2" Text="@item.EmbeddedUrl"></MudTextField>
+										<MudTextField T="string" ReadOnly="true" Variant="Variant.Outlined"  Label="Uploader" Text="@item.AppUser.Name"> </MudTextField>
 									</MudForm>
 								</MudCardContent>
 							  </MudTabPanel>
