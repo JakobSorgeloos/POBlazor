@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public abstract class Media
+    public class Media
     {
         #region Properties
 
@@ -26,29 +26,26 @@ namespace Domain
         [DataType(DataType.Url, ErrorMessage = "Gelieve een geldige Url in te geven")]
         public string Url { get; set; }
 
-        
         [Display(Name = "Publiek")]
 
         public bool IsPublic { get; set; }
 
-        public string InitialsUser { get; set; }
-        public List<Review> Review { get; set; }
+        public int LikesCount { get; set; } = 0;
+
         public AppUser User { get; set; }
 
-        [Range(0, 5)]
-        public float GemRating { get; set; }
         public List<Comment> Comments { get; set; }
-        public List<Playlist> Playlists { get; set; }
+        public List<Playlist> Favourites { get; set; }
         #endregion
 
         #region Comments
         //Abstracte klasse die gebruikt wordt om de mediaobjecten in 1 lijst te kunnen steken (overzichtspagina)
         //Staan veel algemene properties in
-        
-       
-       
 
-        //TODO: Specifieke properties per mediatype aanmaken bvb: Serie heeft episodes en seizoenen
+
+
+
+
         #endregion
     }
 }

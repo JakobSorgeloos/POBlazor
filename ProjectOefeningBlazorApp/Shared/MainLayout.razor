@@ -22,8 +22,11 @@
                     <MudSpacer />
                     <LoginDisplay></LoginDisplay>
                     
-                    <MudIconButton Icon="@Icons.Material.Rounded.Brightness4" Color="Color.Inherit" Title="Toggle Dark/Light Mode" OnClick="@((e) => DarkMode())">Toggle Dark/Light Mode</MudIconButton>
-                </MudAppBar>
+                   
+                
+                <MudIconButton Icon="@Icons.Material.Rounded.Brightness4" Color="Color.Inherit" Title="Toggle Dark/Light Mode" OnClick="@((e) => DarkMode())">Toggle Dark/Light Mode</MudIconButton>
+                <MudIconButton Icon ="@Icons.Custom.Brands.GitHub"  Color="Color.Inherit" Target="_blank" Link="https://github.com/JakobSorgeloos"></MudIconButton>    
+            </MudAppBar>
                 <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
                     <MudDrawerHeader>
                         <MudText Typ    o="Typo.h5" Class="mt-1">Media Maestro</MudText>
@@ -35,7 +38,7 @@
                 </MudMainContent>
             </MudLayout>
         
-            @*TODO: Disabled buttons toevoegen als ze niet ingelogd zijn https://mudblazor.com/components/button *@
+            
             @code {
                 bool _drawerOpen = false;
 

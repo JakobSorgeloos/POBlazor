@@ -1,17 +1,25 @@
 ﻿
 
 @inject IHttpContextAccessor _httpContext
-@inject MediaService mediaService
-@inject NavigationManager NavigationManager
+@inject IMediaService mediaService
+
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Add Media</MudText>
+        <MudText Typo="Typo.h4">Add Media</MudText>
     </TitleContent>
-    <DialogContent>
-
+    <DialogContent> <MudPaper> <MudText Typo="Typo.h6"> Preview </MudText>
+        @if (!string.IsNullOrEmpty(vmForm.Url))
+                {
+        <MudContainer >
+            <iframe style=" height: 250px; border: none" src="@mediaService.EmbeddedUrlBuilder(vmForm.Url)" title="@vmForm.Title"></iframe>
+        </MudContainer>
+        }else {
+            
+        }
+       </MudPaper>
         <MudForm @ref="@fm">
             <MudTextField T="string" @bind-Text="vmForm.Title" Label="Title" Required="true"></MudTextField>
-            <MudTextField T="string" @bind-Text="vmForm.Url" Label="Url" HelperText="No youtu.be links, only youtube.com/watch" Required="true"></MudTextField>
+            <MudTextField T="string" @bind-Text="vmForm.Url" Immediate="true" Label="Url" HelperText="No youtu.be links, only youtube.com/watch" Required="true"></MudTextField>
             
             <MudSwitch Color="Color.Primary" @bind-Checked="vmForm.IsPublic">Public?</MudSwitch>
 
@@ -33,6 +41,7 @@
     AddMediaViewModel vmForm = new AddMediaViewModel();
     protected void CreateMedia()
     {
+        
         vmForm.Gebruiker = _httpContext.HttpContext.User.Identity.Name;
         mediaService.InsertMedia(vmForm);
         MudDialog.Close(DialogResult.Ok(true));

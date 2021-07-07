@@ -1,57 +1,52 @@
 ﻿
 
 @inject IHttpContextAccessor _httpContext
-@inject MediaService mediaService
+@inject IMediaService mediaService
 @inject NavigationManager NavigationManager
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Add Media</MudText>
+        <MudText Typo="Typo.h4">Edit Media</MudText>
     </TitleContent>
     <DialogContent>
-
+        <MudPaper><MudText Typo="Typo.h6"> Preview </MudText>
+        @if (!string.IsNullOrEmpty(vmForm.Url))
+                {
+        <MudContainer >
+            <iframe style=" height: 250px; border: none" src="@mediaService.EmbeddedUrlBuilder(vmForm.Url)" title="@vmForm.Title"></iframe>
+        </MudContainer>
+        }else {
+            
+        }
+       </MudPaper>
         <MudForm @ref="@fm">
-            <MudTextField T="string" @bind-Text="vmForm.Title" Label="Title" Required="true"></MudTextField>
-            <MudTextField T="string" @bind-Text="vmForm.Url" Label="Url" HelperText="No youtu.be links, only youtube.com/watch" Required="true"></MudTextField>
-            <MudSelect Required="true" T="string" Label="Type of media">
-                <MudSelectItem Value="@("Podcast")" />
-                <MudSelectItem Value="@("Music")" />
-                <MudSelectItem Value="@("Film")" />
-                <MudSelectItem Value="@("Serie")" />
-            </MudSelect>
+            <MudTextField T="string" @bind-Text="vmForm.Title" @bind-Value="@vmForm.Title"Label="Title" Required="true"></MudTextField>
+            <MudTextField T="string" @bind-Text="vmForm.Url" Immediate="true" @bind-Value="@vmForm.Url" Label="Url" HelperText="No youtu.be links, only youtube.com/watch" Required="true"></MudTextField>
             <MudSwitch Color="Color.Success" @bind-Checked="vmForm.IsPublic">Public?</MudSwitch>
-
-        </MudForm>
+          </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
 
-        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Primary" OnClick="CreateMedia">Add</MudButton>
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Primary" OnClick="UpdateMedia">Edit</MudButton>
     </DialogActions>
 
 
 </MudDialog>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 @code {
     MudForm fm;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    AddMediaViewModel vmForm = new AddMediaViewModel();
-    protected void CreateMedia()
+    [Parameter] public int Key { get; set; }
+    EditMediaViewModel vmForm = new EditMediaViewModel();
+    protected override async Task OnInitializedAsync()
     {
-        vmForm.Gebruiker = _httpContext.HttpContext.User.Identity.Name;
-        mediaService.InsertMedia(vmForm);
+        vmForm =  await mediaService.ConvertMediaToEditVm(Key);
+    }
+
+    protected async Task UpdateMedia()
+    {        
+        await mediaService.UpdateMedia(vmForm);
         MudDialog.Close(DialogResult.Ok(true));
     }
     void Cancel()

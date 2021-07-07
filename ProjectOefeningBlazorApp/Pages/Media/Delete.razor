@@ -15,7 +15,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="DeleteServer">Delete Server</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteItem">Delete Server</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -28,10 +28,10 @@
         MudDialog.Cancel();
     }
 
-    private void DeleteServer()
+    private void DeleteItem()
     {
-        //In a real world scenario this bool would probably be a service to delete the item from api/database
-        Snackbar.Add("Server Deleted", Severity.Success);
+        
+        Snackbar.Add("Item.Deleted", Severity.Success);
         MudDialog.Close(DialogResult.Ok(media.Key));
     }
 }

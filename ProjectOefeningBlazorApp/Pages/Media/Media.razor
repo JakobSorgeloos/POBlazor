@@ -1,7 +1,9 @@
 ﻿@page "/media"
-@inject MediaService mediaService
+@using ProjectOefeningBlazorApp.Pages.Comments
+@inject IMediaService mediaService
+@inject ICommentService commentService
 @inject IDialogService dialogService
-
+@inject IHttpContextAccessor _httpContext
 
 
 
@@ -9,123 +11,205 @@
 
 <MudGrid>
 
-    <MudItem xs="6">
+	<MudItem xs="6">
 
-        <MudGrid Spacing="2" Justify="Justify.Center">
+		<MudGrid Spacing="2" Justify="Justify.Center">
 
-            @if (MediaList.Count == 0)
-            {
-                <MudText Class="pt-3">Loading...!</MudText>
-            }
+			@if (MediaList.Count == 0)
+			{
+				<MudText Class="pt-3">Loading...!</MudText>
+			}
+			else
+			{
+				foreach (var item in MediaList)
+				{
+					<MudItem xs="6">
+						<MudCard>
+							 <MudCardHeader>
+								<CardHeaderAvatar>
+									<MudAvatar Color="Color.Tertiary"> @item.AppUser.Initials</MudAvatar>
+								</CardHeaderAvatar>
+								<CardHeaderContent>
+									<MudText Typo="Typo.h6"> @item.Title</MudText>
+								</CardHeaderContent>
+								<CardHeaderActions>
+									<MudIconButton OnClick="@(() => EditMedia(item))" Disabled="@LoggedIn" Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
+									<MudIconButton OnClick="@(() => DeleteMedia(item))" Disabled="@LoggedIn" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
+								</CardHeaderActions>
+							</MudCardHeader>
 
-            else
-            {
-                foreach (var item in MediaList)
-                { 
-                    <MudItem>
-                        <MudCard>
-                            <MudCardHeader>
-                                <CardHeaderAvatar>
-                                    <MudAvatar Color="Color.Secondary">@item.InitialsUser</MudAvatar>
-                                </CardHeaderAvatar>
-                                <CardHeaderContent>
-                                    <MudText Typo="Typo.h6"> @item.Title</MudText>
-                                </CardHeaderContent>
-                                <CardHeaderActions>
-                                    <MudIconButton OnClick="@(() => EditMedia(item))" Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
-                                    <MudIconButton OnClick="@(() => DeleteMedia(item))" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
-                                </CardHeaderActions>
-                            </MudCardHeader>
-
-                            <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-                                <MudTabPanel Icon="@Icons.Material.Filled.Equalizer" Text="Media">
-                                    <MudContainer>
-                                        <iframe style=" height: 250px; border: none" src="@item.EmbeddedUrl" title="@item.Title"></iframe>
-                                    </MudContainer>
-                                </MudTabPanel>
-                                <MudTabPanel Icon="@Icons.Material.Filled.ListAlt" Text=" Details">
-                                    <MudCardContent>
-                                        <MudForm>
-                                            <MudField Variant="Variant.Outlined" Label="Title" Disabled="true">@item.Title</MudField>
-                                            <MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
-                                            <MudField Variant="Variant.Outlined" Label="EmbeddedUrl" Disabled="true">@item.EmbeddedUrl</MudField>
-                                            <MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
-                                            <MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
-
-                                        </MudForm>
-                                    </MudCardContent>
-
-                                </MudTabPanel>
-
-                            </MudTabs>
-                            <MudCardActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
-                            </MudCardActions>
-                        </MudCard>
-                    </MudItem>
-                }
-
-            }
-
-        </MudGrid>
-
-    </MudItem>
-    
+						 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" Color="Color.Info">
+							  <MudTabPanel Icon="@Icons.Material.Filled.Equalizer" Text="Media">
+								 <MudContainer>
+									<iframe style=" height: 250px; border: none" src="@item.EmbeddedUrl" title="@item.Title" placeholder></iframe>
+								 </MudContainer>
+							  </MudTabPanel>
+							  <MudTabPanel Icon="@Icons.Material.Filled.ListAlt" Text=" Details">
+								<MudCardContent>
+									<MudForm>
+										<MudField Variant="Variant.Outlined" Label="Title" Disabled="true">@item.Title</MudField>
+										<MudField Variant="Variant.Outlined" Label="Url" Disabled="true">@item.Url</MudField>
+										<MudField Variant="Variant.Outlined" Label="EmbeddedUrl" Disabled="true">@item.EmbeddedUrl</MudField>
+										<MudField Variant="Variant.Outlined" Label="Uploader" Disabled="true">@item.AppUser.Name</MudField>
+									</MudForm>
+								</MudCardContent>
+							  </MudTabPanel>
+							  <MudTabPanel Icon="@Icons.Material.Filled.Comment" Text="Comments">
+								<MudGrid>
+									
+										@if(item.Comments.Count ==0)
+										{
+											<MudText Typo="Typo.h6"> No comments yet!</MudText>
+										}
+										else {
+											foreach(var comment in item.Comments)
+											{<MudItem >
+											<MudCard >
+												 <MudCardHeader>
+													<CardHeaderContent>
+														 <MudText Typo="Typo.h6">@comment.Title</MudText>
+												    </CardHeaderContent>
+													<CardHeaderActions>
+													<MudAvatar  Color="Color.Tertiary"> @comment.Gebruiker.Initials</MudAvatar>
+													</CardHeaderActions>
+												</MudCardHeader>
+												<MudCardContent>
+											        <MudText Typo="Typo.body2">@comment.CommentText</MudText>
+												</MudCardContent>
+												</MudCard>	
+											</MudItem>
+											}
+										}
+								</MudGrid>
+							</MudTabPanel>
+						</MudTabs>
+					<MudCardActions>
+						<MudButton OnClick="@(() => AddComment(item))" Disabled="@LoggedIn" Color="Color.Default">
+							<MudIcon Class="mx-2 my-2" Icon="@Icons.Material.Filled.AddComment"></MudIcon>
+						</MudButton>
+						<MudSpacer />
+						<MudBadge Class="mx-2 my-2" Content="@item.Likes" Color="Color.Secondary" Overlap="true" Bottom="true">
+							<MudToggleIconButton @onclick="@(()=> LikeMedia(item))" ToggledIcon="@Icons.Material.Filled.Favorite" Disabled="@LoggedIn" Toggled="@item.Liked" Icon="@Icons.Material.Filled.Favorite" ToggledColor="Color.Secondary" />
+						</MudBadge>
+					</MudCardActions>
+			</MudCard>
+		</MudItem>
+		   }
+	}
+	  </MudGrid>
+  </MudItem>
+	<MudContainer Class="pt-3" MaxWidth="MaxWidth.ExtraLarge">
+	  <MudTooltip Placement="Placement.End" Text="Add media">
+	 <MudFab OnClick="AddMedia" Disabled="@LoggedIn" Icon="@Icons.Material.Filled.Add" Color="Color.Secondary" />
+	</MudTooltip>
+	</MudContainer>
 </MudGrid>
-<AuthorizeView>
-    <Authorized>
-        <MudContainer Class ="pt-3"  MaxWidth="MaxWidth.ExtraLarge">
-            <MudTooltip Placement="Placement.End" Text="Add media">
-                <MudFab OnClick="@(() => AddMedia())" Icon="@Icons.Material.Filled.Add" Color="Color.Secondary" />
-            </MudTooltip>
-        </MudContainer>
-    </Authorized>
-</AuthorizeView>
-    @code {
 
-        List<MediaViewModel> MediaList = new List<MediaViewModel>();
 
-        protected override async Task OnInitializedAsync()
-        {
-            MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
-        }
-        protected async Task DeleteMedia(MediaViewModel media)
-        {
-            var parameters = new DialogParameters();
-            parameters.Add("ContentText", "Do you really want to delete this media? This process cannot be undone.");
-            parameters.Add("ButtonText", "Delete");
-            parameters.Add("Color", Color.Error);
+@code {
+	private bool LoggedIn { get; set; }
 
-            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+	List<MediaViewModel> MediaList = new List<MediaViewModel>();
 
-            var dialog = dialogService.Show<GeneralDialog>("Delete", parameters, options);
-            var result = await dialog.Result;
+	protected override async Task OnInitializedAsync()
+	{
+		LoggedIn = !(_httpContext.HttpContext.User.Identity.IsAuthenticated);
+		await GetMediaList();
+	}
+	protected async Task DeleteMedia(MediaViewModel media)
+	{
+		var parameters = new DialogParameters();
+		parameters.Add("ContentText", "Do you really want to delete this media? This process cannot be undone.");
+		parameters.Add("ButtonText", "Delete");
+		parameters.Add("Color", Color.Error);
 
-            if (!result.Cancelled)
-            {
-                await mediaService.DeleteMediaAsync(media.Key);
-                _snackbar.Add("Item was deleted successfully", Severity.Info);
-                MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
-            }
-        }
+		var options = new DialogOptions()
+		{
+			CloseButton = true,
+			MaxWidth = MaxWidth.ExtraSmall
+		};
 
-        protected async Task EditMedia(MediaViewModel media)
-        {
-            MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
+		var dialog = dialogService.Show<GeneralDialog>("Delete", parameters, options);
+		var result = await dialog.Result;
 
-        }
-        protected async Task AddMedia()
-        {
-            var dialog = dialogService.Show<AddMedia>();
-            var result = await dialog.Result;
+		if (!result.Cancelled)
+		{
+			await mediaService.DeleteMediaAsync(media.Key);
+			_snackbar.Add("Item was deleted successfully", Severity.Info);
+			await GetMediaList();
+		}
+	}
 
-            if (!result.Cancelled)
-            {
-                _snackbar.Add("Item was added succesfully", Severity.Success);
-                MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
-            }
+	protected async Task EditMedia(MediaViewModel media)
+	{
 
-        }
+		var parameters = new DialogParameters();
+		parameters.Add("Key", media.Key);
 
+		var dialog = dialogService.Show<EditMedia>("editMedia", parameters);
+		var result = await dialog.Result;
+
+		if (!result.Cancelled)
+		{
+			_snackbar.Add("Item was added succesfully", Severity.Success);
+			await GetMediaList();
+		}
+	}
+	protected async Task LikeMedia(MediaViewModel media)
+	{
+
+		var result = await mediaService.LikeSong(media, _httpContext.HttpContext.User.Identity.Name);
+		if (result)
+		{
+			await GetMediaList();
+		}
+	}
+	protected async Task AddMedia()
+	{
+		var dialog = dialogService.Show<AddMedia>();
+		var result = await dialog.Result;
+
+		if (!result.Cancelled)
+		{
+			_snackbar.Add("Item was added succesfully", Severity.Success);
+			await GetMediaList();
+		}
+
+	}
+	protected async Task AddComment(MediaViewModel media)
+	{
+
+		var parameters = new DialogParameters();
+		parameters.Add("MediaKey", media.Key);
+
+		var dialog = dialogService.Show<AddComment>("Add Comment", parameters);
+		var result = await dialog.Result;
+
+		if (!result.Cancelled)
+		{
+			_snackbar.Add("Comment was added succesfully", Severity.Success);
+			await GetMediaList();
+		}
+	}
+
+	protected async Task GetMediaList()
+	{
+		MediaList = await Task.Run(() => mediaService.GetAllMediaViewModels());
+		await GetLikesOnMedia();
+	}
+	protected async Task GetLikesOnMedia()
+	{
+
+		if (_httpContext.HttpContext.User.Identity.IsAuthenticated)
+		{
+			foreach (var media in MediaList)
+			{
+
+				if (await mediaService.CheckIfUserLikedMediaObject(media, _httpContext.HttpContext.User.Identity.Name))
+				{
+					media.Liked = true;
+				}
+			}
+		}
+	}
     }

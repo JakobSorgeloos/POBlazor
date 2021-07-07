@@ -11,17 +11,17 @@ namespace Services.Interfaces
 {
     public interface IMediaService
     {
-        public List<Media> GetAllMedia();
+        public Task<List<Media>> GetAllMedia();
         public bool InsertMedia(AddMediaViewModel addMediaViewModel);
-        public Media GetMedia(int Id);
-        public bool UpdateMedia(int Id, EditMediaViewModel editMediaViewModel);
-        public Task<bool> DeleteMediaAsync(Media media);
-        public List<MediaViewModel> GetMediaViewModels(List<Media> medias);
-        public Media ConvertAddVmToMedia(AddMediaViewModel addMediaViewModel);
+        public Task<Media> GetMedia(int Id);
+        public Task<bool> UpdateMedia(EditMediaViewModel editMediaViewModel);
+        public Task<bool> DeleteMediaAsync(int Id);
+        public Task<List<MediaViewModel>> GetAllMediaViewModels();
+        public Task<Media> ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel);
+        public Task<EditMediaViewModel> ConvertMediaToEditVm(int Id);
         public string EmbeddedUrlBuilder(string url);
-        public Media ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel);
-        public EditMediaViewModel ConvertMediaToEditVm(Media media);
-
+        public Task<bool> LikeSong(MediaViewModel media, string user);
+        public Task<bool> CheckIfUserLikedMediaObject(MediaViewModel media, string user);
 
     }
 }

@@ -1,69 +1,49 @@
-﻿@page "/comment"
+﻿
 
-@inject CommentService commentService
-@inject NavigationManager NavigationManager
+@inject ICommentService commentService
+@inject IHttpContextAccessor _httpContext
 
-    <h3>AddComment</h3>
-<AuthorizeView>
+   
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h4">Add comment</MudText>
+    </TitleContent>
+    <DialogContent> 
+        <MudForm @ref="@fm">
+            <MudTextField T="string" @bind-Text="vmForm.Title" Label="Title" Required="true"></MudTextField>
+            <MudTextField T="string" Lines="5" @bind-Text="vmForm.CommentText" Immediate="true" Label="Comment"  Required="true"></MudTextField>
+            
+           
 
-    <Authorized>
-        <h2>Add comment</h2>
-        <hr />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
 
-        <form>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="form-group">
-                       <label class="control-label" for="Title">Title</label>
-                        <input form="Title" class="form-control" @bind="@vmForm.Title" />
-                    </div>
-                    <div class=form-group>
-                        <label class="control-label" for="CommentText"> Text </label>
-                        <textarea form="CommentText" class="form-control" rows="3" placeholder="..." @bind="@vmForm.CommentText"></textarea>
-                    </div>
-
-
-
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <input type="button" class="btn btn-primary" @onclick="@CreateMedia" value="AddComment" />
-                        <input type="button" class="btn btn-primary" @onclick="@Cancel" value="Cancel" />
-                    </div>
-                </div>
-            </div>
-        </form>
-    </Authorized>
-    <NotAuthorized>
-
-        <p>Please <a href="Identity/Account/Login">login here</a></p>
-        <p>Or <a href="Identity/Account/Register">register</a> if you haven't already</p>
-
-    </NotAuthorized>
+        <MudButton Variant="Variant.Filled" Class="ml-auto" Color="Color.Primary" OnClick="CreateComment">Add Comment</MudButton>
+    </DialogActions>
 
 
-</AuthorizeView>
+</MudDialog>
+
 
 
 
 
 @code {
+    MudForm fm;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     AddCommentViewModel vmForm = new AddCommentViewModel();
-    protected void CreateMedia()
+      [Parameter] public int MediaKey { get; set; }
+    protected void CreateComment()
     {
+        vmForm.MediaKey = MediaKey;
+        vmForm.Gebruiker = _httpContext.HttpContext.User.Identity.Name;
         commentService.InsertComment(vmForm);
-        NavigationManager.NavigateTo("allC");
-    }
+        MudDialog.Close(DialogResult.Ok(true));
+     }
     void Cancel()
     {
-        NavigationManager.NavigateTo("allC");
+        MudDialog.Cancel();
     }
-
-}
-
-@code {
-
-}
+}2

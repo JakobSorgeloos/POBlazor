@@ -86,7 +86,6 @@ namespace ProjectOefeningBlazorApp.Areas.Identity.Pages.Account
                     initials = initials + item.Substring(0, 1).ToUpper();
                 }
 
-                
                 var user = new AppUser { UserName = Input.Email, Email = Input.Email,Name = Input.Name,Initials = initials};
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)

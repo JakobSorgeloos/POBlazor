@@ -10,14 +10,15 @@ using Services.ViewModels;
 using Services.ViewModels.Media;
 using Microsoft.Extensions.Options;
 
+
 namespace Services.Service
 {
-    public class MediaService /*TODO : IMediaService*/
+    public class MediaService : IMediaService
     {
 
         #region Property
         private readonly ApplicationDbContext _applicationDbContext;
-        public  IOptions<AppSettings> _config { get; set; }
+        public IOptions<AppSettings> _config { get; set; }
 
         #endregion
 
@@ -32,7 +33,7 @@ namespace Services.Service
         #region Get List of Media
         public async Task<List<Media>> GetAllMedia()
         {
-            return await _applicationDbContext.MediaSites.ToListAsync();
+            return await _applicationDbContext.MediaSites.Include(media => media.User.LikedSongs.MediaSites).Include(media => media.Comments).ToListAsync();
         }
         #endregion
 
@@ -41,7 +42,7 @@ namespace Services.Service
 
         {
             var media = ConvertAddVmToMedia(addMediaViewModel);
-         
+
             _applicationDbContext.MediaSites.Add(media);
             _applicationDbContext.SaveChanges();
             return true;
@@ -51,17 +52,17 @@ namespace Services.Service
         #region Get Media by Id
         public async Task<Media> GetMedia(int Id)
         {
-            var media = await _applicationDbContext.MediaSites.FirstOrDefaultAsync(c => c.Key.Equals(Id));
+            //include nodig voor object appuser
+            var media = await _applicationDbContext.MediaSites.Include("User").FirstOrDefaultAsync(c => c.Key.Equals(Id));
             return media;
         }
         #endregion
 
         #region Update Media
 
-
-        public async Task<bool> UpdateMedia(int Id, EditMediaViewModel editMediaViewModel)
+        public async Task<bool> UpdateMedia(EditMediaViewModel editMediaViewModel)
         {
-            var media = await GetMedia(Id);
+            var media = await GetMedia(editMediaViewModel.Key);
             media.IsPublic = editMediaViewModel.IsPublic;//Todo Add mapper
             media.Title = editMediaViewModel.Title;
             media.Url = editMediaViewModel.Url;
@@ -84,7 +85,60 @@ namespace Services.Service
         }
         #endregion
 
-        #region Convert MediaList To ViewModelList
+        #region LikeSongPart
+        public async Task<bool> LikeSong(MediaViewModel media, string user)
+        {
+            var mediaDbItem = await GetMedia(media.Key);
+            var AppUser = _applicationDbContext.Users.Include(appUser => appUser.LikedSongs).FirstOrDefault(_ => _.UserName == user);
+            var playlist = AppUser.LikedSongs;
+
+            if (playlist.MediaSites == null)
+            {
+                playlist = new Playlist()
+                {
+                    MediaSites = new List<Media>(),
+                    User = AppUser
+                };
+                mediaDbItem.LikesCount++;
+
+                playlist.MediaSites.Add(mediaDbItem);
+                _applicationDbContext.Playlists.Add(playlist);
+                await _applicationDbContext.SaveChangesAsync();
+                return true;
+            }
+            if (playlist.MediaSites.Contains(mediaDbItem))
+            {
+                mediaDbItem.LikesCount--;
+                playlist.MediaSites.Remove(mediaDbItem);
+                _applicationDbContext.Playlists.Update(playlist);
+                await _applicationDbContext.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                mediaDbItem.LikesCount++;
+                playlist.MediaSites.Add(mediaDbItem);
+                _applicationDbContext.Playlists.Update(playlist);
+                await _applicationDbContext.SaveChangesAsync();
+                return true;
+            }
+        }
+
+        public async Task<bool> CheckIfUserLikedMediaObject(MediaViewModel media, string user)
+        {
+            var mediaDbItem = await GetMedia(media.Key);
+            var appUser = _applicationDbContext.Users.Include(appUser => appUser.LikedSongs.MediaSites)
+                .FirstOrDefault(_ => _.UserName == user);
+            if (appUser != null && appUser.LikedSongs.MediaSites.Contains(mediaDbItem))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+        #endregion
+
+        #region Converters
         public async Task<List<MediaViewModel>> GetAllMediaViewModels()
         {
             var medias = await GetAllMedia();
@@ -94,25 +148,23 @@ namespace Services.Service
 
                 listvm.Add(new MediaViewModel()
                 {
-
                     Key = media.Key,
                     EmbeddedUrl = media.EmbeddedUrl,
                     AppUser = media.User,
                     Title = media.Title,
                     IsPublic = media.IsPublic,
                     Url = media.Url,
-                    InitialsUser = media.InitialsUser
-                }) ;
+                    Likes = media.LikesCount,
+                    Comments = media.Comments
+                });
             }
             return listvm;
         }
-        #endregion
 
-        #region Convert AddMediaVM to Media
         public Media ConvertAddVmToMedia(AddMediaViewModel addMediaViewModel)
         {
-            //create correct media Object, see Select MediaType based of input
-            var media = new Music();
+
+            var media = new Media();
 
             //create correct embbed url spotify and youtube only at the moment
             media.EmbeddedUrl = EmbeddedUrlBuilder(addMediaViewModel.Url);
@@ -121,19 +173,13 @@ namespace Services.Service
             media.Url = addMediaViewModel.Url;
             media.IsPublic = addMediaViewModel.IsPublic;
             media.User = _applicationDbContext.Users.FirstOrDefault(_ => _.UserName == addMediaViewModel.Gebruiker);
-            media.InitialsUser = media.User.Initials;
+
             return media;
         }
 
-        
-
-        #endregion
-
-        #region Convert EditMediaVM to Media & Media to EditMediaVM
-
         public async Task<Media> ConvertEditVmToMedia(EditMediaViewModel editMediaViewModel)
         {
-            
+
             var media = await GetMedia(editMediaViewModel.Key);
 
             //create correct embbed url spotify and youtube only at the moment
@@ -142,13 +188,10 @@ namespace Services.Service
             media.Title = editMediaViewModel.Title;
             media.Url = editMediaViewModel.Url;
             media.IsPublic = editMediaViewModel.IsPublic;
-           
-          
 
             return media;
-
         }
-       
+
 
         public async Task<EditMediaViewModel> ConvertMediaToEditVm(int Id)
         {
@@ -168,7 +211,7 @@ namespace Services.Service
         public string EmbeddedUrlBuilder(string url)
         {
 
-            
+            if (string.IsNullOrEmpty(url)) return "";
             string id = "";
             var z = "";
             if (url.Contains("you"))
@@ -179,7 +222,7 @@ namespace Services.Service
                 z = _config.Value.YoutubeLinks + id;
                 return z;
             }
-            else
+            else if (url.Contains("spotify"))
             {
                 var y = url.Split(new string[] { ".com/" }, StringSplitOptions.None);
                 var x = y[1].Split('?');
@@ -187,6 +230,7 @@ namespace Services.Service
                 z = _config.Value.SpotifyLinks + id;
                 return (z);
             }
+            else return "";
         }
         #endregion
     }
